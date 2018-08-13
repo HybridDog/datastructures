@@ -20,6 +20,28 @@ local stack_mt = {
 		is_empty = function(self)
 			return self.n == 0
 		end,
+		size = function(self)
+			return self.n
+		end,
+		to_table = function(self)
+			local t = {}
+			for i = 1, self.n do
+				t[i] = self[i]
+			end
+			return t
+		end,
+		to_string = function(self, value_tostring)
+			if self.n == 0 then
+				return "empty stack"
+			end
+			value_tostring = value_tostring or tostring
+			local t = {}
+			for i = 1, self.n do
+				t[i] = value_tostring(self[i])
+			end
+			return self.n .. " elements; bottom to top: " ..
+				table.concat(t, ", ")
+		end,
 	}
 }
 
@@ -57,6 +79,35 @@ local fifo_mt = {
 		end,
 		is_empty = function(self)
 			return self.n_in == 0 and self.p_out == self.n_out+1
+		end,
+		size = function(self)
+			return self.n_in + self.n_out - self.p_out + 1
+		end,
+		to_table = function(self)
+			local t = {}
+			local k = 1
+			for i = self.p_out, self.n_out do
+				t[k] = self.source[i]
+				k = k+1
+			end
+			for i = 1, self.n_in do
+				t[k] = self.sink[i]
+				k = k+1
+			end
+			return t
+		end,
+		to_string = function(self, value_tostring)
+			local size = self:size()
+			if size == 0 then
+				return "empty fifo"
+			end
+			value_tostring = value_tostring or tostring
+			local t = self:to_table()
+			for i = 1, #t do
+				t[i] = value_tostring(t[i])
+			end
+			return size .. " elements; oldest to newest: " ..
+				table.concat(t, ", ")
 		end,
 	}
 }
