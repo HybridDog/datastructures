@@ -61,8 +61,7 @@ local fifo_mt = {
 			local p = self.p_out
 			if p <= self.n_out then
 				local v = self.source[p]
-				-- a table is only shrunk when a new element is added
-				self.source[p] = p <= 128 or nil
+				self.source[p] = nil
 				self.p_out = p+1
 				return v
 			end
@@ -71,7 +70,7 @@ local fifo_mt = {
 			self.n_out = self.n_in
 			self.n_in = 0
 			local v = self.source[1]
-			self.source[1] = true
+			self.source[1] = nil
 			self.p_out = 2
 			return v
 		end,

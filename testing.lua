@@ -162,3 +162,88 @@ if false then
 
 	]]
 end
+
+if false then
+	local fifo = datastructures.create_fifo()
+	function thous()
+		for i = 1,1000 do
+			fifo:add(5)
+		end
+		for i = 1,1000 do
+			fifo:take()
+		end
+	end
+	function thous_single()
+		for i = 1,1000 do
+			fifo:add(5)
+			fifo:take()
+		end
+	end
+	--~ local fifo,a,b = {},1,1
+	--~ function thous()
+	--~ -- local fifo,a,b = {},1,1
+		--~ for i = 1,1000 do
+			--~ fifo[b] = 5
+			--~ b = b+1
+		--~ end
+		--~ for i = 1,1000 do
+			--~ _=fifo[a]
+			--~ fifo[a] = nil
+			--~ a = a+1
+		--~ end
+	--~ end
+	--~ function thous_single()
+	--~ -- local fifo,a,b = {},1,1
+		--~ for i = 1,1000 do
+			--~ fifo[b] = 5
+			--~ b = b+1
+			--~ _=fifo[a]
+			--~ fifo[a] = nil
+			--~ a = a+1
+		--~ end
+	--~ end
+	print("fifo full tsd " .. benchmark_function(thous) .. " s⁻¹")
+	print("fifo 1xtsd reuse " .. benchmark_function(thous_single) .. " s⁻¹")
+	fifo = datastructures.create_fifo()
+	--~ fifo,a,b = {},1,1
+	print("fifo 1xtsd new " .. benchmark_function(thous_single) .. " s⁻¹")
+
+	--[[
+	with true until 128:
+	fifo full tsd 57,286.904521826 s⁻¹
+	fifo 1xtsd reuse 269,884.33333333 s⁻¹
+	fifo 1xtsd new 269,687.82020812 s⁻¹
+
+	with true until 1:
+	fifo full tsd 237,624.66666667 s⁻¹
+	fifo 1xtsd reuse 269,899.91003336 s⁻¹
+	fifo 1xtsd new 269,249.24358359 s⁻¹
+
+	always nil:
+	fifo full tsd 234,458.8436941 s⁻¹
+	fifo 1xtsd reuse 268,114.57729514 s⁻¹
+	fifo 1xtsd new 267,796 s⁻¹
+
+	always nil, but keep first value:
+	fifo full tsd 234,041.43262523 s⁻¹
+	fifo 1xtsd reuse 294,292.90190237 s⁻¹
+	fifo 1xtsd new 294,202.13719858 s⁻¹
+
+	keep old values:
+	fifo full tsd 235,383.76461624 s⁻¹
+	fifo 1xtsd reuse 298,366.8010888 s⁻¹
+	fifo 1xtsd new 298,613.66666667 s⁻¹
+
+	set sink to empty table on swap
+	fifo full tsd 96,857.838570269 s⁻¹
+	fifo 1xtsd reuse 8,357.8802037171 s⁻¹
+	fifo 1xtsd new 8,439.5737716939 s⁻¹
+
+	set sink to new table {true} on swap
+	fifo full tsd 99,955.033468233 s⁻¹
+	fifo 1xtsd reuse 17,849.125093541 s⁻¹
+	fifo 1xtsd new 17,820.12543187 s⁻¹
+
+
+	]]
+end
