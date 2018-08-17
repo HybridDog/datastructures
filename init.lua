@@ -4,17 +4,13 @@ datastructures = {}
 local stack_mt = {
 	__index = {
 		push = function(self, v)
-			local n = self.n+1
-			self.n = n
-			self[n] = v
+			self.n = self.n+1
+			self[self.n] = v
 		end,
 		pop = function(self)
-			local n = self.n
-			local v = self[n]
-			-- fill the lower part of the table that the array part
-			-- can't shrink too much in a following push
-			self[n] = n <= 128 or nil
-			self.n = n-1
+			local v = self[self.n]
+			self[self.n] = nil
+			self.n = self.n-1
 			return v
 		end,
 		is_empty = function(self)
@@ -46,7 +42,9 @@ local stack_mt = {
 }
 
 function datastructures.create_stack()
-	local stack = {n = 0}
+	-- setting the first element to true makes it ~10 times faster with luajit
+	-- when the stack always contains less or equal to one element
+	local stack = {n = 0, true}
 	setmetatable(stack, stack_mt)
 	return stack
 end
