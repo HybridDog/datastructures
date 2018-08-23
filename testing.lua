@@ -19,9 +19,23 @@ if false then
 	print(fifo:to_string())
 	print""
 
+	print"testing binary heap"
+	local heap = datastructures.create_binary_heap(function(a, b)
+		return a < b
+	end)
+	print(heap:to_string())
+	heap:add(1)
+	heap:add(6)
+	heap:add(3)
+	heap:add(-5)
+	print(heap:to_string())
+	print(heap:take(), heap:take(), heap:is_empty(), heap:size())
+	print(heap:to_string())
+	print""
+
 	print"testing pairing heap"
 	local heap = datastructures.create_pairing_heap(function(a, b)
-		return b - a
+		return a < b
 	end)
 	print(heap:to_string())
 	heap:add(1)
@@ -179,6 +193,15 @@ if false then
 			fifo:take()
 		end
 	end
+	function single_multi()
+		for j = 1,10000 do
+			local fifo = datastructures.create_fifo()
+			for i = 1,10 do
+				fifo:add(5)
+				fifo:take()
+			end
+		end
+	end
 	--~ local fifo,a,b = {},1,1
 	--~ function thous()
 	--~ -- local fifo,a,b = {},1,1
@@ -202,11 +225,12 @@ if false then
 			--~ a = a+1
 		--~ end
 	--~ end
-	print("fifo full tsd " .. benchmark_function(thous) .. " s⁻¹")
-	print("fifo 1xtsd reuse " .. benchmark_function(thous_single) .. " s⁻¹")
-	fifo = datastructures.create_fifo()
+	--~ print("fifo full tsd " .. benchmark_function(thous) .. " s⁻¹")
+	--~ print("fifo 1xtsd reuse " .. benchmark_function(thous_single) .. " s⁻¹")
+	--~ fifo = datastructures.create_fifo()
 	--~ fifo,a,b = {},1,1
-	print("fifo 1xtsd new " .. benchmark_function(thous_single) .. " s⁻¹")
+	--~ print("fifo 1xtsd new " .. benchmark_function(thous_single) .. " s⁻¹")
+	print("fifo multi " .. benchmark_function(single_multi) .. " s⁻¹")
 
 	--[[
 	with true until 128:
@@ -245,5 +269,69 @@ if false then
 	fifo 1xtsd new 17,820.12543187 s⁻¹
 
 
+	]]
+end
+
+if false then
+	local N = 10000000
+	local data = {true}
+	for i = 1, N do
+		local r = math.random()
+		if r > 0.5 then
+			data[i] = false
+		else
+			data[i] = r
+		end
+	end
+	local compare = function(a, b)
+		return a < b
+	end
+
+	function test_binary()
+		local heap = datastructures.create_binary_heap(compare)
+		for i = 1, N do
+			if not data[i] then
+				if not heap:is_empty() then
+					heap:take()
+				end
+			else
+				heap:add(data[i])
+			end
+		end
+	end
+	function test_pairing()
+		local heap = datastructures.create_pairing_heap(compare)
+		for i = 1, N do
+			if not data[i] then
+				if not heap:is_empty() then
+					heap:take()
+				end
+			else
+				heap:add(data[i])
+			end
+		end
+	end
+	--~ print("binary heap times " .. benchmark_function(test_binary) .. " s⁻¹")
+	--~ print("pairing heap times " .. benchmark_function(test_pairing) .. " s⁻¹")
+
+	function test_binary_singl()
+		for j = 1, 10000 do
+			local heap = datastructures.create_binary_heap(compare)
+			for i = 1, 10 do
+				heap:add(5)
+				heap:take()
+			end
+		end
+	end
+	print("binary heap single times "
+		.. benchmark_function(test_binary_singl) .. " s⁻¹")
+
+
+	--[[
+	N=10000, similar speed differences for N=1000 and N=100
+	binary heap times 1110.9481557527 s⁻¹
+	pairing heap times 329.20198174262 s⁻¹
+
+	binary heap with and without {true} in initialization showed same speed
 	]]
 end

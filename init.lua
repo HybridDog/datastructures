@@ -110,7 +110,8 @@ local fifo_mt = {
 }
 
 function datastructures.create_fifo()
-	local fifo = {n_in = 0, n_out = 0, p_out = 1, sink = {}, source = {}}
+	local fifo = {n_in = 0, n_out = 0, p_out = 1,
+		sink = {true}, source = {true}}
 	setmetatable(fifo, fifo_mt)
 	return fifo
 end
@@ -183,9 +184,13 @@ local binary_heap_mt = {
 			value_tostring = value_tostring or tostring
 			local t = {}
 			for i = 1, self.n do
-				t[i] = value_tostring(self[i])
+				local sep = ""
+				if i > 1 then
+					sep = (math.log(i) / math.log(2)) % 1 == 0 and "; " or ", "
+				end
+				t[i] = sep .. value_tostring(self[i])
 			end
-			return self.n .. " elements: " .. table.concat(t, ", ")
+			return self.n .. " elements: " .. table.concat(t, "")
 		end,
 	}
 }
@@ -308,7 +313,8 @@ function datastructures.create_pairing_heap(compare)
 	return pairing_heap
 end
 
---~ datastructures.create_priority_queue = datastructures.create_pairing_heap
+
+datastructures.create_priority_queue = datastructures.create_binary_heap
 
 
-dofile(minetest.get_modpath"datastructures" .. "/testing.lua")
+--~ dofile(minetest.get_modpath"datastructures" .. "/testing.lua")
