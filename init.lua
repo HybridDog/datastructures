@@ -116,6 +116,87 @@ function datastructures.create_fifo()
 end
 
 
+local binary_heap_mt = {
+	__index = {
+		peek = function(self)
+			return self[1]
+		end,
+		add = function(self, v)
+			local i = self.n+1
+			self.n = i
+			self[i] = v
+			local p = math.floor(i / 2)
+			while p > 0
+			and self.compare(self[i], self[p]) do
+				-- new data has higher priority than its parent
+				self[i], self[p] = self[p], self[i]
+				i = p
+				p = math.floor(p / 2)
+			end
+		end,
+		take = function(self)
+			local v = self[1]
+			self[1] = self[self.n]
+			self[self.n] = nil
+			self.n = self.n-1
+			local i = 1
+			while true do
+				local l = i + i
+				local r = l+1
+				if l > self.n then
+					break
+				end
+				if r > self.n then
+					if self.compare(self[l], self[i]) then
+						self[i], self[l] = self[l], self[i]
+					end
+					break
+				end
+				local preferred_child =
+					self.compare(self[l], self[r]) and l or r
+				if not self.compare(self[preferred_child], self[i]) then
+					break
+				end
+				self[i], self[preferred_child] = self[preferred_child], self[i]
+				i = preferred_child
+			end
+			return v
+		end,
+		-- merge and decrease-key is not yet implemented
+		is_empty = function(self)
+			return self.n == 0
+		end,
+		size = function(self)
+			return self.n
+		end,
+		to_table = function(self)
+			local t = {}
+			for i = 1, self.n do
+				t[i] = self[i]
+			end
+			return t
+		end,
+		to_string = function(self, value_tostring)
+			if self.n == 0 then
+				return "empty binary heap"
+			end
+			value_tostring = value_tostring or tostring
+			local t = {}
+			for i = 1, self.n do
+				t[i] = value_tostring(self[i])
+			end
+			return self.n .. " elements: " .. table.concat(t, ", ")
+		end,
+	}
+}
+
+function datastructures.create_binary_heap(compare)
+	local binary_heap = {compare = compare, n = 0, true}
+	setmetatable(binary_heap, binary_heap_mt)
+	return binary_heap
+end
+
+
 local pairing_heap_mt = {
 	__index = {
 		peek = function(self)
@@ -132,11 +213,11 @@ local pairing_heap_mt = {
 				return
 			end
 			self.n = self.n+1
-			if self.compare(data, self.root.data) <= 0 then
+			if not self.compare(data, self.root.data) then
+				-- new data has lower or equal priority than root
 				self.root.children[#self.root.children+1] = node
 				return
 			end
-			-- new data has lower priority than root
 			node.children = {self.root}
 			self.root = node
 		end,
@@ -152,8 +233,8 @@ local pairing_heap_mt = {
 			local node = oldroot[#oldroot]
 			for i = #oldroot-1, 1, -1 do
 				local node2 = oldroot[i]
-				if self.compare(node2.data, node.data) > 0 then
-					-- node2 has lower priority than node
+				if self.compare(node2.data, node.data) then
+					-- node2 has higher priority than node
 					node, node2 = node2, node
 				end
 				node.children[#node.children+1] = node2
@@ -227,7 +308,7 @@ function datastructures.create_pairing_heap(compare)
 	return pairing_heap
 end
 
-datastructures.create_priority_queue = datastructures.create_pairing_heap
+--~ datastructures.create_priority_queue = datastructures.create_pairing_heap
 
 
---~ dofile(minetest.get_modpath"datastructures" .. "/testing.lua")
+dofile(minetest.get_modpath"datastructures" .. "/testing.lua")
