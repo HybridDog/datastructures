@@ -1,4 +1,5 @@
-if false then
+--~ if false then
+if 1 then
 	print"testing stack"
 	local stack = datastructures.create_stack()
 	print(stack:to_string())
@@ -20,23 +21,36 @@ if false then
 	print""
 
 	print"testing binary heap"
-	local heap = datastructures.create_binary_heap(function(a, b)
+	local compar = function(a, b)
 		return a < b
-	end)
-	print(heap:to_string())
+	end
+	local heap = datastructures.create_binary_heap(compar)
+	print("Empty: " .. heap:to_string())
 	heap:add(1)
 	heap:add(6)
 	heap:add(3)
 	heap:add(-5)
-	print(heap:to_string())
-	print(heap:take(), heap:take(), heap:is_empty(), heap:size())
-	print(heap:to_string())
+	print("Some elements added: " .. heap:to_string())
+	local heap2 = datastructures.create_binary_heap(compar)
+	heap2:add(72)
+	heap2:add(1.4)
+	heap2:add(4)
+	heap2:add(4.5)
+	heap2:add(4.4)
+	heap2:add(4.5)
+	heap2:add(1)
+	print("Another heap: " .. heap2:to_string())
+	heap:merge(heap2)
+	print("After merging: " .. heap:to_string())
+	print("take take empty size",
+		heap:take(), heap:take(), heap:is_empty(), heap:size())
+	print("After taking: " .. heap:to_string())
+	heap:sort()
+	print("After sorting: " .. table.concat(heap, ", "))
 	print""
 
 	print"testing pairing heap"
-	local heap = datastructures.create_pairing_heap(function(a, b)
-		return a < b
-	end)
+	local heap = datastructures.create_pairing_heap(compar)
 	print(heap:to_string())
 	heap:add(1)
 	heap:add(6)

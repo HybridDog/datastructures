@@ -117,6 +117,49 @@ function datastructures.create_fifo()
 end
 
 
+local function sift_up(binary_heap, i)
+	local p = math.floor(i / 2)
+	while p > 0
+	and binary_heap.compare(binary_heap[i], binary_heap[p]) do
+		-- new data has higher priority than its parent
+		binary_heap[i], binary_heap[p] = binary_heap[p], binary_heap[i]
+		i = p
+		p = math.floor(p / 2)
+	end
+end
+
+local function sift_down(binary_heap, i)
+	local n = binary_heap.n
+	while true do
+		local l = i + i
+		local r = l+1
+		if l > n then
+			break
+		end
+		if r > n then
+			if binary_heap.compare(binary_heap[l], binary_heap[i]) then
+				binary_heap[i], binary_heap[l] = binary_heap[l], binary_heap[i]
+			end
+			break
+		end
+		local preferred_child =
+			binary_heap.compare(binary_heap[l], binary_heap[r]) and l or r
+		if not binary_heap.compare(binary_heap[preferred_child],
+				binary_heap[i]) then
+			break
+		end
+		binary_heap[i], binary_heap[preferred_child] =
+			binary_heap[preferred_child], binary_heap[i]
+		i = preferred_child
+	end
+end
+
+local function build(binary_heap)
+	for i = math.floor(binary_heap.n / 2), 1, -1 do
+		sift_down(binary_heap, i)
+	end
+end
+
 local binary_heap_mt = {
 	__index = {
 		peek = function(self)
@@ -126,44 +169,41 @@ local binary_heap_mt = {
 			local i = self.n+1
 			self.n = i
 			self[i] = v
-			local p = math.floor(i / 2)
-			while p > 0
-			and self.compare(self[i], self[p]) do
-				-- new data has higher priority than its parent
-				self[i], self[p] = self[p], self[i]
-				i = p
-				p = math.floor(p / 2)
-			end
+			sift_up(self, i)
 		end,
 		take = function(self)
 			local v = self[1]
 			self[1] = self[self.n]
 			self[self.n] = nil
 			self.n = self.n-1
-			local i = 1
-			while true do
-				local l = i + i
-				local r = l+1
-				if l > self.n then
-					break
-				end
-				if r > self.n then
-					if self.compare(self[l], self[i]) then
-						self[i], self[l] = self[l], self[i]
-					end
-					break
-				end
-				local preferred_child =
-					self.compare(self[l], self[r]) and l or r
-				if not self.compare(self[preferred_child], self[i]) then
-					break
-				end
-				self[i], self[preferred_child] = self[preferred_child], self[i]
-				i = preferred_child
-			end
+			sift_down(self, 1)
 			return v
 		end,
-		-- merge and decrease-key is not yet implemented
+		find = function(self, cond)
+			for i = 1, self.n do
+				if cond(self[i]) then
+					return i
+				end
+			end
+		end,
+		change_element = function(self, v, i)
+			i = i or 1
+			local priority_lower = self.compare(self[i], v)
+			self[i] = v
+			if priority_lower then
+				sift_down(self, i)
+			elseif i > 1 then
+				sift_up(self, i)
+			end
+		end,
+		merge = function(self, other)
+			local n = self.n
+			for i = 1, other.n do
+				self[n + i] = other[i]
+			end
+			self.n = n + other.n
+			build(self)
+		end,
 		is_empty = function(self)
 			return self.n == 0
 		end,
@@ -176,6 +216,15 @@ local binary_heap_mt = {
 				t[i] = self[i]
 			end
 			return t
+		end,
+		sort = function(self)
+			for i = self.n, 1, -1 do
+				self[i], self[1] = self[1], self[i]
+				self.n = self.n-1
+				sift_down(self, 1)
+			end
+			setmetatable(self, nil)
+			self.compare = nil
 		end,
 		to_string = function(self, value_tostring)
 			if self.n == 0 then
@@ -195,7 +244,22 @@ local binary_heap_mt = {
 	}
 }
 
-function datastructures.create_binary_heap(compare)
+function datastructures.create_binary_heap(data)
+	local compare = data
+	if type(data) == "table" then
+		if data.input then
+			-- make data.elements a binary heap
+			local binary_heap = data.input
+			binary_heap.n = data.n or #binary_heap
+			binary_heap.compare = data.compare
+			setmetatable(binary_heap, binary_heap_mt)
+			if not data.input_sorted then
+				build(binary_heap)
+			end
+			return
+		end
+		compare = data.compare
+	end
 	local binary_heap = {compare = compare, n = 0, true}
 	setmetatable(binary_heap, binary_heap_mt)
 	return binary_heap
