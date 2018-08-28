@@ -378,7 +378,7 @@ local pairing_heap_mt = {
 			end
 			local t = {}
 			local k = 1
-			local bfs_fifo = datastructures.create_fifo()
+			local bfs_fifo = datastructures.create_queue()
 			bfs_fifo:add(self.root)
 			while not bfs_fifo:is_empty() do
 				local node = bfs_fifo:take()
