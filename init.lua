@@ -1,7 +1,8 @@
 datastructures = {}
 
 
-local stack_mt = {
+local stack_mt
+stack_mt = {
 	__index = {
 		push = function(self, v)
 			self.n = self.n+1
@@ -19,12 +20,26 @@ local stack_mt = {
 		size = function(self)
 			return self.n
 		end,
+		clone = function(self, copy_element)
+			local stack
+			if copy_element then
+				stack = {n = self.n, true}
+				for i = 1, self.n do
+					stack[i] = copy_element(self[i])
+				end
+			else
+				stack, n = self:to_table()
+				stack.n = n
+			end
+			setmetatable(stack, stack_mt)
+			return stack
+		end,
 		to_table = function(self)
 			local t = {}
 			for i = 1, self.n do
 				t[i] = self[i]
 			end
-			return t
+			return t, self.n
 		end,
 		to_string = function(self, value_tostring)
 			if self.n == 0 then
@@ -41,16 +56,24 @@ local stack_mt = {
 	}
 }
 
-function datastructures.create_stack()
-	-- setting the first element to true makes it ~10 times faster with luajit
-	-- when the stack always contains less or equal to one element
-	local stack = {n = 0, true}
+function datastructures.create_stack(data)
+	local stack
+	if type(data) == "table"
+	and data.input then
+		stack = data.input
+		stack.n = data.n or #data.input
+	else
+		-- setting the first element to true makes it ~10 times faster with
+		-- luajit when the stack always contains less or equal to one element
+		stack = {n = 0, true}
+	end
 	setmetatable(stack, stack_mt)
 	return stack
 end
 
 
-local fifo_mt = {
+local fifo_mt
+fifo_mt = {
 	__index = {
 		add = function(self, v)
 			local n = self.n_in+1
@@ -80,6 +103,18 @@ local fifo_mt = {
 		size = function(self)
 			return self.n_in + self.n_out - self.p_out + 1
 		end,
+		clone = function(self, copy_element)
+			local source, n = self:to_table()
+			if copy_element then
+				for i = 1, n do
+					source[i] = copy_element(source[i])
+				end
+			end
+			local fifo = {n_in = 0, n_out = n, p_out = 1,
+				sink = {true}, source = source}
+			setmetatable(fifo, fifo_mt)
+			return fifo
+		end,
 		to_table = function(self)
 			local t = {}
 			local k = 1
@@ -91,7 +126,7 @@ local fifo_mt = {
 				t[k] = self.sink[i]
 				k = k+1
 			end
-			return t
+			return t, k-1
 		end,
 		to_string = function(self, value_tostring)
 			local size = self:size()
@@ -109,9 +144,15 @@ local fifo_mt = {
 	}
 }
 
-function datastructures.create_fifo()
-	local fifo = {n_in = 0, n_out = 0, p_out = 1,
-		sink = {true}, source = {true}}
+function datastructures.create_queue(data)
+	local fifo
+	if type(data) == "table"
+	and data.input then
+		fifo = {n_in = 0, n_out = data.n or #data.input, p_out = 1,
+			sink = {true}, source = data.input}
+	else
+		fifo = {n_in = 0, n_out = 0, p_out = 1, sink = {true}, source = {true}}
+	end
 	setmetatable(fifo, fifo_mt)
 	return fifo
 end
@@ -160,7 +201,8 @@ local function build(binary_heap)
 	end
 end
 
-local binary_heap_mt = {
+local binary_heap_mt
+binary_heap_mt = {
 	__index = {
 		peek = function(self)
 			return self[1]
@@ -210,12 +252,24 @@ local binary_heap_mt = {
 		size = function(self)
 			return self.n
 		end,
+		clone = function(self, copy_element)
+			local binary_heap, n = self:to_table()
+			if copy_element then
+				for i = 1, n do
+					binary_heap[i] = copy_element(binary_heap[i])
+				end
+			end
+			binary_heap.n = n
+			binary_heap.compare = self.compare
+			setmetatable(binary_heap, binary_heap_mt)
+			return binary_heap
+		end,
 		to_table = function(self)
 			local t = {}
 			for i = 1, self.n do
 				t[i] = self[i]
 			end
-			return t
+			return t, self.n
 		end,
 		sort = function(self)
 			for i = self.n, 1, -1 do

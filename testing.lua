@@ -11,7 +11,7 @@ if 1 then
 	print""
 
 	print"testing fifo"
-	local fifo = datastructures.create_fifo()
+	local fifo = datastructures.create_queue()
 	print(fifo:to_string())
 	fifo:add"first"
 	fifo:add"snd"
@@ -192,7 +192,7 @@ if false then
 end
 
 if false then
-	local fifo = datastructures.create_fifo()
+	local fifo = datastructures.create_queue()
 	function thous()
 		for i = 1,1000 do
 			fifo:add(5)
@@ -209,7 +209,7 @@ if false then
 	end
 	function single_multi()
 		for j = 1,10000 do
-			local fifo = datastructures.create_fifo()
+			local fifo = datastructures.create_queue()
 			for i = 1,10 do
 				fifo:add(5)
 				fifo:take()
@@ -241,7 +241,7 @@ if false then
 	--~ end
 	--~ print("fifo full tsd " .. benchmark_function(thous) .. " s⁻¹")
 	--~ print("fifo 1xtsd reuse " .. benchmark_function(thous_single) .. " s⁻¹")
-	--~ fifo = datastructures.create_fifo()
+	--~ fifo = datastructures.create_queue()
 	--~ fifo,a,b = {},1,1
 	--~ print("fifo 1xtsd new " .. benchmark_function(thous_single) .. " s⁻¹")
 	print("fifo multi " .. benchmark_function(single_multi) .. " s⁻¹")
