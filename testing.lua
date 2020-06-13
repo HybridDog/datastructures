@@ -1,7 +1,8 @@
---~ if false then
+local datastructures = dofile("datastructures.lua")
+
 if 1 then
 	print"testing stack"
-	local stack = datastructures.create_stack()
+	local stack = datastructures.Stack()
 	print(stack:to_string())
 	stack:push"first"
 	stack:push"snd"
@@ -11,7 +12,7 @@ if 1 then
 	print""
 
 	print"testing fifo"
-	local fifo = datastructures.create_queue()
+	local fifo = datastructures.Queue()
 	print(fifo:to_string())
 	fifo:add"first"
 	fifo:add"snd"
@@ -24,14 +25,14 @@ if 1 then
 	local compar = function(a, b)
 		return a < b
 	end
-	local heap = datastructures.create_binary_heap(compar)
+	local heap = datastructures.BinaryHeap(compar)
 	print("Empty: " .. heap:to_string())
 	heap:add(1)
 	heap:add(6)
 	heap:add(3)
 	heap:add(-5)
 	print("Some elements added: " .. heap:to_string())
-	local heap2 = datastructures.create_binary_heap(compar)
+	local heap2 = datastructures.BinaryHeap(compar)
 	heap2:add(72)
 	heap2:add(1.4)
 	heap2:add(4)
@@ -48,7 +49,9 @@ if 1 then
 	heap:sort()
 	print("After sorting: " .. table.concat(heap, ", "))
 	print""
+end
 
+function test_pairing_heap()
 	print"testing pairing heap"
 	local heap = datastructures.create_pairing_heap(compar)
 	print(heap:to_string())
@@ -65,10 +68,10 @@ end
 
 local TIME = 3
 
-local clock = minetest.get_us_time
---~ local clock = os.clock
-local us = TIME * 1000000
---~ local us = TIME
+--~ local clock = minetest.get_us_time
+local clock = os.clock
+--~ local us = TIME * 1000000
+local us = TIME
 local function benchmark_function(fct, ...)
 	local start = clock()
 	local fin = start
@@ -79,12 +82,12 @@ local function benchmark_function(fct, ...)
 		total = total + 1
 		fin = clock()
 	end
-	--~ return total / (fin - start)
-	return total * 1000000 / (fin - start)
+	return total / (fin - start)
+	--~ return total * 1000000 / (fin - start)
 end
 
 if false then
-	local stack = datastructures.create_stack()
+	local stack = datastructures.Stack()
 	function stackth()
 		for i = 1,1000 do
 			stack:push(5)
@@ -120,7 +123,7 @@ if false then
 	--~ end
 	print("stack full tsd " .. benchmark_function(stackth) .. " s⁻¹")
 	print("stack 1xtsd reuse " .. benchmark_function(stacksin) .. " s⁻¹")
-	stack = datastructures.create_stack()
+	stack = datastructures.Stack()
 	--~ stack,n = {},n
 	print("stack 1xtsd new " .. benchmark_function(stacksin) .. " s⁻¹")
 
@@ -192,7 +195,7 @@ if false then
 end
 
 if false then
-	local fifo = datastructures.create_queue()
+	local fifo = datastructures.Queue()
 	function thous()
 		for i = 1,1000 do
 			fifo:add(5)
@@ -209,7 +212,7 @@ if false then
 	end
 	function single_multi()
 		for j = 1,10000 do
-			local fifo = datastructures.create_queue()
+			local fifo = datastructures.Queue()
 			for i = 1,10 do
 				fifo:add(5)
 				fifo:take()
@@ -241,7 +244,7 @@ if false then
 	--~ end
 	--~ print("fifo full tsd " .. benchmark_function(thous) .. " s⁻¹")
 	--~ print("fifo 1xtsd reuse " .. benchmark_function(thous_single) .. " s⁻¹")
-	--~ fifo = datastructures.create_queue()
+	--~ fifo = datastructures.Queue()
 	--~ fifo,a,b = {},1,1
 	--~ print("fifo 1xtsd new " .. benchmark_function(thous_single) .. " s⁻¹")
 	print("fifo multi " .. benchmark_function(single_multi) .. " s⁻¹")
@@ -302,7 +305,7 @@ if false then
 	end
 
 	function test_binary()
-		local heap = datastructures.create_binary_heap(compare)
+		local heap = datastructures.BinaryHeap(compare)
 		for i = 1, N do
 			if not data[i] then
 				if not heap:is_empty() then
@@ -330,7 +333,7 @@ if false then
 
 	function test_binary_singl()
 		for j = 1, 10000 do
-			local heap = datastructures.create_binary_heap(compare)
+			local heap = datastructures.BinaryHeap(compare)
 			for i = 1, 10 do
 				heap:add(5)
 				heap:take()
