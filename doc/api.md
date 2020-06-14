@@ -14,6 +14,17 @@ local path = […]
 local datastructures = dofile(path .. "/datastructures/datastructures.lua")
 ```
 
+The code is written to be fast, so there are no tests for invalid arguments
+in `datastructures.lua`.
+For development or testing, the `datastructures_debug.lua` file can be used.
+It adds assertations to the methods so that e.g. pop cannot be executed on an
+empty stack.
+```lua
+local path = […]
+datastructures_path_prefix = path .. "/"
+local datastructures = dofile(path .. "/datastructures/datastructures_debug.lua")
+```
+
 
 ## Datastructures
 
@@ -78,6 +89,12 @@ local datastructures = dofile(path .. "/datastructures/datastructures.lua")
 
 
 ### Binary Heap
+
+An implementation of a Pairing Heap is available in another branch.
+Testing has shown that the Binary Heap is ca. 3.6 times as fast as the Pairing
+Heap in practice,
+probably due to less table allocations,
+so there is only a Binary Heap for now.
 
 #### Initialization
 

@@ -1,4 +1,5 @@
-local datastructures = dofile("datastructures.lua")
+datastructures_path_prefix = ""
+local datastructures = dofile("datastructures_debug.lua")
 
 if 1 then
 	print"testing stack"
