@@ -51,6 +51,7 @@ Stack.__index = {
 				stack[i] = copy_element(self[i])
 			end
 		else
+			local n
 			stack, n = self:to_table()
 			stack.n = n
 		end
