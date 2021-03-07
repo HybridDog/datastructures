@@ -52,7 +52,8 @@ if 1 then
 	print""
 end
 
-function test_pairing_heap()
+--[[
+local function test_pairing_heap()
 	print"testing pairing heap"
 	local heap = datastructures.create_pairing_heap(compar)
 	print(heap:to_string())
@@ -65,8 +66,12 @@ function test_pairing_heap()
 	print(heap:to_string())
 	print""
 end
+--]]
 
 
+local benchmark_stack = false
+local benchmark_queue = false
+local benchmark_priority_queues = false
 local TIME = 3
 
 --~ local clock = minetest.get_us_time
@@ -87,18 +92,18 @@ local function benchmark_function(fct, ...)
 	--~ return total * 1000000 / (fin - start)
 end
 
-if false then
+if benchmark_stack then
 	local stack = datastructures.Stack()
-	function stackth()
-		for i = 1,1000 do
+	local function stackth()
+		for _ = 1,1000 do
 			stack:push(5)
 		end
-		for i = 1,1000 do
+		for _ = 1,1000 do
 			stack:pop()
 		end
 	end
-	function stacksin()
-		for i = 1,1000 do
+	local function stacksin()
+		for _ = 1,1000 do
 			stack:push(5)
 			stack:pop()
 		end
@@ -195,9 +200,10 @@ if false then
 	]]
 end
 
-if false then
+if benchmark_queue then
+	--[[
 	local fifo = datastructures.Queue()
-	function thous()
+	local function thous()
 		for i = 1,1000 do
 			fifo:add(5)
 		end
@@ -205,16 +211,16 @@ if false then
 			fifo:take()
 		end
 	end
-	function thous_single()
+	local function thous_single()
 		for i = 1,1000 do
 			fifo:add(5)
 			fifo:take()
 		end
-	end
-	function single_multi()
-		for j = 1,10000 do
+	end--]]
+	local function single_multi()
+		for _ = 1,10000 do
 			local fifo = datastructures.Queue()
-			for i = 1,10 do
+			for _ = 1,10 do
 				fifo:add(5)
 				fifo:take()
 			end
@@ -290,7 +296,11 @@ if false then
 	]]
 end
 
-if false then
+if benchmark_priority_queues then
+	local compare = function(a, b)
+		return a < b
+	end
+	--[[
 	local N = 10000000
 	local data = {true}
 	for i = 1, N do
@@ -301,11 +311,8 @@ if false then
 			data[i] = r
 		end
 	end
-	local compare = function(a, b)
-		return a < b
-	end
 
-	function test_binary()
+	local function test_binary()
 		local heap = datastructures.BinaryHeap(compare)
 		for i = 1, N do
 			if not data[i] then
@@ -317,7 +324,7 @@ if false then
 			end
 		end
 	end
-	function test_pairing()
+	local function test_pairing()
 		local heap = datastructures.create_pairing_heap(compare)
 		for i = 1, N do
 			if not data[i] then
@@ -328,14 +335,14 @@ if false then
 				heap:add(data[i])
 			end
 		end
-	end
+	end--]]
 	--~ print("binary heap times " .. benchmark_function(test_binary) .. " s⁻¹")
 	--~ print("pairing heap times " .. benchmark_function(test_pairing) .. " s⁻¹")
 
-	function test_binary_singl()
-		for j = 1, 10000 do
+	local function test_binary_singl()
+		for _ = 1, 10000 do
 			local heap = datastructures.BinaryHeap(compare)
-			for i = 1, 10 do
+			for _ = 1, 10 do
 				heap:add(5)
 				heap:take()
 			end
