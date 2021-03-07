@@ -88,7 +88,7 @@ local datastructures = dofile(path .. "/datastructures/datastructures_debug.lua"
   string, `tostring` is used if it is omitted.
 
 
-### Binary Heap
+### Implicit Binary Heap
 
 An implementation of a Pairing Heap is available in another branch.
 Testing has shown that the Binary Heap is ca. 3.6 times as fast as the Pairing
@@ -116,6 +116,8 @@ so there is only a Binary Heap for now.
 * `take()`: takes the element with highest priority from the heap
 * `find(cond)`: returns the current index of an element `e` where `cond(e)`
   returns true; nil is returned if no element is found
+  The found index likely becomes invalid once the heap is changed by,
+  for example, the add or take method.
 * `change_element(v[, i])`: changes the element in the given index to `v`
   The element with the highest priority is changed if `i` is omitted.
   This method can be used to change an element's priority.
