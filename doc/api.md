@@ -3,7 +3,7 @@
 To use the datastructures in a lua program inside a git repository,
 I recommend to add the files with `git subtree`, for example:
 ```
-git subtree add --squash --prefix=datastructures git@github.com:HybridDog/datastructures.git
+git subtree add --squash --prefix=datastructures git@github.com:HybridDog/datastructures.git master
 ```
 You may need to change the prefix to some subdirectory,
 or change the datastructures repository url if you want to use some fork of
